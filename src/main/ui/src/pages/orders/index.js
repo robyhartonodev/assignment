@@ -1,9 +1,12 @@
-import {useRouter} from 'next/router'
+import Layout from "@/components/layout";
 
 const OrderIndex = () => {
-    const router = useRouter()
 
-    return <p>Order Index</p>
+    return (
+        <Layout>
+            <p>Order Index</p>
+        </Layout>
+    )
 }
 
 export default OrderIndex
