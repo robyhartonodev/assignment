@@ -2,6 +2,7 @@ package com.empulse.assignment.controller;
 
 import com.empulse.assignment.model.Customer;
 import com.empulse.assignment.service.CustomerServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +31,13 @@ public class CustomerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Customer create(@RequestBody Customer resource) {
+    public Customer create(@Valid @RequestBody Customer resource) {
         return customerServiceImpl.save(resource);
     }
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Customer updated(@PathVariable("id") Long id, @RequestBody Customer resource) throws Exception {
+    public Customer updated(@PathVariable("id") Long id, @Valid @RequestBody Customer resource) throws Exception {
         Customer customer = customerServiceImpl.findById(id).orElseThrow(() -> new Exception("Customer Not Found"));
 
         customer.setEmail(resource.getEmail());
