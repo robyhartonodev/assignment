@@ -37,7 +37,7 @@ public class CustomerController {
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Customer updated(@PathVariable("id") Long id, @Valid @RequestBody Customer resource) throws Exception {
+    public Customer update(@PathVariable("id") Long id, @Valid @RequestBody Customer resource) throws Exception {
         Customer customer = customerServiceImpl.findById(id).orElseThrow(() -> new Exception("Customer Not Found"));
 
         customer.setEmail(resource.getEmail());
