@@ -1,21 +1,35 @@
 import {useFlashStore} from "@/stores/flash";
-import {useEffect} from "react";
-import {Alert, Box, Button} from "@mui/material";
+import {Alert, Snackbar} from "@mui/material";
 
 export default function FlashMessage() {
-    const isOpen = useFlashStore((state) => state.isOpen)
-    const message = useFlashStore((state) => state.message)
-    const type = useFlashStore((state) => state.type)
+    const resetFlashMessage = {
+        type: 'info',
+        message: 'flash message 123',
+        isOpen: false
+    }
 
-    const updateIsOpen = useFlashStore((state) => state.updateIsOpen)
+    const flashMessage = useFlashStore((state) => state.flashMessage)
+    const showFlashMessage = useFlashStore((state) => state.showFlashMessage)
 
     return (
         <>
             {
-                (isOpen && message.length > 0) ?
-                    <Alert severity={type} onClose={() => {updateIsOpen(false)}}>
-                        {message}
-                    </Alert> :
+                flashMessage.isOpen ?
+                    <Snackbar
+                        open={flashMessage.isOpen}
+                        message={flashMessage.message}
+                        autoHideDuration={6000}
+                        onClose={() => {
+                            showFlashMessage(resetFlashMessage)
+                        }}>
+                        <Alert
+                            severity={flashMessage.type}
+                            fullWidth
+                        >
+                            {flashMessage.message}
+                        </Alert>
+                    </Snackbar>
+                    :
                     <></>
             }
         </>
