@@ -45,8 +45,8 @@ export default function CustomerForm() {
 
             //make sure to serialize your JSON body
             body: JSON.stringify({
-                name: customer.name,
-                email: customer.email
+                name: name,
+                email: email
             })
         })
             .then((response) => {
@@ -62,7 +62,6 @@ export default function CustomerForm() {
     const updateCustomer = () => {
         // TODO
     }
-
 
     return (
         <div>

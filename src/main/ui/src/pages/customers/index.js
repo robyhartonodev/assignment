@@ -14,9 +14,15 @@ const CustomerIndex = () => {
             .then((response) => response.json())
             .then((data) => setRows(data))
             .catch(() => {
-                console.log("fetch get all error")
+                showFlashMessage({
+                    type: 'danger',
+                    message: 'Get customers failed',
+                    isOpen: true
+                })
             })
     }
+
+    const showFlashMessage = useFlashStore((state) => state.showFlashMessage)
 
     const deleteCustomer = (row) => {
         const customerId = row.id;
@@ -24,9 +30,19 @@ const CustomerIndex = () => {
         fetch(`http://localhost:8080/api/v1/customers/${customerId}`, {
             method: 'DELETE',
         })
-            .then((response) => response.json())
+            .then((response) => {
+                showFlashMessage({
+                    type: 'success',
+                    message: 'Customer Deleted Successfuly',
+                    isOpen: true
+                })
+            })
             .catch(() => {
-                console.log("fetch delete error")
+                showFlashMessage({
+                    type: 'danger',
+                    message: 'Delete failed',
+                    isOpen: true
+                })
             })
             .finally(() => {
                 getCustomers()
@@ -44,10 +60,6 @@ const CustomerIndex = () => {
                 renderCell: ({row}) => {
                     return (
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            {/*<Button color="primary" onClick={() => {*/}
-                            {/*}} variant="contained" sx={{mr: '4px'}}>*/}
-                            {/*    View*/}
-                            {/*</Button>*/}
                             <Button color="success" onClick={() => {
                             }} variant="contained" sx={{mr: '4px'}}>
                                 Edit
@@ -68,8 +80,6 @@ const CustomerIndex = () => {
         getCustomers()
     }, [])
 
-    const showFlashMessage = useFlashStore((state) => state.showFlashMessage)
-
     return (
         <Layout>
             <Typography variant="h3" marginBottom={4}>
@@ -81,14 +91,6 @@ const CustomerIndex = () => {
             <Button color="secondary" variant="contained" sx={{mb: '8px'}}>
                 Create
             </Button>
-
-            <Button onClick={() => {
-                showFlashMessage({
-                    type: 'error',
-                    message: 'Error 322',
-                    isOpen: true
-                })
-            }}>Test</Button>
 
             <div style={{width: '100%'}}>
                 <DataGrid
