@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar";
 import Head from "next/head";
+import FlashMessage from "@/components/flashMessage";
 
 export default function Layout({children}) {
     return (
@@ -12,6 +13,7 @@ export default function Layout({children}) {
             </Head>
             <Navbar></Navbar>
             <main style={{padding: "16px"}}>
+                <FlashMessage></FlashMessage>
                 {children}
             </main>
         </>
