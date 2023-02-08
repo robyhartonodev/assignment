@@ -72,7 +72,7 @@ public class OrderController {
             for (MultipartFile file : multipartFiles) {
                 byte[] bytes = file.getBytes();
                 String fileName = "orderId-" + savedOrder.getId().toString() + "-" + file.getOriginalFilename() ;
-                Path path = Paths.get("src/main/resources/static/images/" + fileName);
+                Path path = Paths.get("src/main/resources/files/" + fileName);
                 Files.write(path, bytes);
 
                 // Save Order Files

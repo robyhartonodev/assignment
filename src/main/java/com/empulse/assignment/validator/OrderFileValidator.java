@@ -27,8 +27,8 @@ public class OrderFileValidator implements ConstraintValidator<ValidFile, Multip
     }
 
     private boolean isSupportedContentType(String contentType) {
-        return contentType.equals("image/png")
-                || contentType.equals("image/jpg")
-                || contentType.equals("image/jpeg");
+        return contentType.equals("files/png")
+                || contentType.equals("files/jpg")
+                || contentType.equals("files/jpeg");
     }
 }
