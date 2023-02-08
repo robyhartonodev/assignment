@@ -9,13 +9,22 @@ create table "orders"
 (
     "id"              bigserial primary key not null,
     "subject"         varchar(255)          not null,
-    "images"          json null,
     "order_date"      date                  not null,
     "order_date_time" timestamp(0) without time zone not null,
-    "customer_id"     bigint                not null,
-    "created_at"      timestamp(0) without time zone null,
-    "updated_at"      timestamp(0) without time zone null
+    "status"          bigint                not null,
+    "customer_id"     bigint                not null
 );
 
 alter table "orders"
     add constraint "orders_customer_id_foreign" foreign key ("customer_id") references "orders" ("id") on delete cascade on update cascade;
+
+create table "order_files"
+(
+    "id"       bigserial primary key not null,
+    "name"     varchar(255)          not null,
+    "path"     varchar(255)          not null,
+    "order_id" bigint                not null
+);
+
+alter table "order_files"
+    add constraint "order_files_order_id_foreign" foreign key ("order_id") references "orders" ("id") on delete cascade on update cascade;

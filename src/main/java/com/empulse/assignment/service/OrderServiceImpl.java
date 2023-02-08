@@ -1,5 +1,6 @@
 package com.empulse.assignment.service;
 
+import com.empulse.assignment.model.Customer;
 import com.empulse.assignment.model.Order;
 import com.empulse.assignment.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,10 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
+    }
+
+    public List<Order> findAllByCustomer(Customer customer) {
+        return orderRepository.findAllByCustomer(customer);
     }
 
     @Override
