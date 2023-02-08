@@ -2,6 +2,7 @@ package com.empulse.assignment.controller;
 
 import com.empulse.assignment.model.Customer;
 import com.empulse.assignment.model.Order;
+import com.empulse.assignment.model.OrderFile;
 import com.empulse.assignment.service.CustomerServiceImpl;
 import com.empulse.assignment.service.OrderFileServiceImpl;
 import com.empulse.assignment.service.OrderServiceImpl;
@@ -66,18 +67,27 @@ public class OrderController {
 
         Order savedOrder = orderServiceImpl.save(resource);
 
-        // TODO saving files and save the path in the db
-        StringBuilder fileNames = new StringBuilder();
-
+        // Saving files in the static folder and save the file path and name in the db
         try {
             for (MultipartFile file : multipartFiles) {
                 byte[] bytes = file.getBytes();
-                Path path = Paths.get("src/main/resources/static/images/" + file.getOriginalFilename());
+                String fileName = "orderId-" + savedOrder.getId().toString() + "-" + file.getOriginalFilename() ;
+                Path path = Paths.get("src/main/resources/static/images/" + fileName);
                 Files.write(path, bytes);
-                fileNames.append(file.getOriginalFilename() + ", ");
+
+                // Save Order Files
+                OrderFile orderFile = new OrderFile();
+                orderFile.setName(fileName);
+                orderFile.setPath(path.toString());
+                orderFile.setOrder(savedOrder);
+
+                orderFileServiceImpl.save(orderFile);
             }
 
-            return ResponseEntity.ok().body(savedOrder);
+            // Refresh order object
+            Order updatedOrder = orderServiceImpl.findById(savedOrder.getId()).orElse(null);
+
+            return ResponseEntity.ok().body(updatedOrder);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body(savedOrder);
         }
