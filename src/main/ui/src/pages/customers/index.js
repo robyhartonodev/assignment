@@ -8,6 +8,7 @@ import {useFlashStore} from "@/stores/flash";
 
 const CustomerIndex = () => {
     const [rows, setRows] = useState([])
+    const showFlashMessage = useFlashStore((state) => state.showFlashMessage)
 
     const getCustomers = () => {
         fetch("http://localhost:8080/api/v1/customers")
@@ -21,8 +22,6 @@ const CustomerIndex = () => {
                 })
             })
     }
-
-    const showFlashMessage = useFlashStore((state) => state.showFlashMessage)
 
     const deleteCustomer = (row) => {
         const customerId = row.id;
@@ -50,31 +49,30 @@ const CustomerIndex = () => {
     }
 
     const columns = [
-            {field: 'id', headerName: 'ID', flex: 1},
-            {field: 'name', headerName: 'Name', flex: 1},
-            {field: 'email', headerName: 'Email', flex: 1},
-            {
-                field: 'action',
-                headerName: 'Actions',
-                flex: 1,
-                renderCell: ({row}) => {
-                    return (
-                        <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <Button color="success" onClick={() => {
-                            }} variant="contained" sx={{mr: '4px'}}>
-                                Edit
-                            </Button>
-                            <Button color="error" onClick={() => {
-                                deleteCustomer(row)
-                            }} variant="contained">
-                                Delete
-                            </Button>
-                        </Box>
-                    )
-                }
+        {field: 'id', headerName: 'ID', flex: 1},
+        {field: 'name', headerName: 'Name', flex: 1},
+        {field: 'email', headerName: 'Email', flex: 1},
+        {
+            field: 'action',
+            headerName: 'Actions',
+            flex: 1,
+            renderCell: ({row}) => {
+                return (
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <Button color="success" onClick={() => {
+                        }} variant="contained" sx={{mr: '4px'}}>
+                            Edit
+                        </Button>
+                        <Button color="error" onClick={() => {
+                            deleteCustomer(row)
+                        }} variant="contained">
+                            Delete
+                        </Button>
+                    </Box>
+                )
             }
-        ]
-    ;
+        }
+    ];
 
     useEffect(() => {
         getCustomers()
