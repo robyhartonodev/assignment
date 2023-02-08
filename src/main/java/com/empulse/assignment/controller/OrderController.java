@@ -47,7 +47,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Order> create(
+    public ResponseEntity<?> create(
             @RequestParam MultipartFile[] multipartFiles,
             @RequestParam Integer customerId,
             @RequestParam String subject,
@@ -69,9 +69,22 @@ public class OrderController {
 
         // Saving files in the static folder and save the file path and name in the db
         try {
+            // Validation file type images only and size each cannot be more than 3MB
+            for (MultipartFile file : multipartFiles) {
+                if (file.getSize() > 3 * 1024 * 1024) {
+                    return new ResponseEntity<>("File size too large", HttpStatus.BAD_REQUEST);
+                }
+
+                if (!file.getContentType().equals("image/jpeg") &&
+                        !file.getContentType().equals("image/jpg") &&
+                        !file.getContentType().equals("image/png")) {
+                    return new ResponseEntity<>("Invalid file type", HttpStatus.BAD_REQUEST);
+                }
+            }
+
             for (MultipartFile file : multipartFiles) {
                 byte[] bytes = file.getBytes();
-                String fileName = "orderId-" + savedOrder.getId().toString() + "-" + file.getOriginalFilename() ;
+                String fileName = "orderId-" + savedOrder.getId().toString() + "-" + file.getOriginalFilename();
                 Path path = Paths.get("src/main/resources/files/" + fileName);
                 Files.write(path, bytes);
 
