@@ -3,15 +3,20 @@ package com.empulse.assignment.controller;
 import com.empulse.assignment.model.Customer;
 import com.empulse.assignment.model.Order;
 import com.empulse.assignment.service.CustomerServiceImpl;
+import com.empulse.assignment.service.OrderFileServiceImpl;
 import com.empulse.assignment.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
@@ -19,11 +24,13 @@ import java.util.List;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
     private OrderServiceImpl orderServiceImpl;
+    private OrderFileServiceImpl orderFileServiceImpl;
     private CustomerServiceImpl customerServiceImpl;
 
     @Autowired
-    public OrderController(OrderServiceImpl orderServiceImpl, CustomerServiceImpl customerServiceImpl) {
+    public OrderController(OrderServiceImpl orderServiceImpl, OrderFileServiceImpl orderFileServiceImpl, CustomerServiceImpl customerServiceImpl) {
         this.orderServiceImpl = orderServiceImpl;
+        this.orderFileServiceImpl = orderFileServiceImpl;
         this.customerServiceImpl = customerServiceImpl;
     }
 
@@ -39,14 +46,14 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Order create(
+    public ResponseEntity<Order> create(
             @RequestParam MultipartFile[] multipartFiles,
             @RequestParam Integer customerId,
             @RequestParam String subject,
             @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") Date orderDate,
             @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") Date orderDateTime,
             @RequestParam Integer status
-            ) throws Exception {
+    ) throws Exception {
         Long longCustomerId = Long.valueOf(customerId);
         Customer customer = customerServiceImpl.findById(longCustomerId).orElseThrow(() -> new Exception("Customer Not Found"));
 
@@ -57,7 +64,23 @@ public class OrderController {
         resource.setStatus(status);
         resource.setCustomer(customer);
 
-        return orderServiceImpl.save(resource);
+        Order savedOrder = orderServiceImpl.save(resource);
+
+        // TODO saving files and save the path in the db
+        StringBuilder fileNames = new StringBuilder();
+
+        try {
+            for (MultipartFile file : multipartFiles) {
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get("src/main/resources/static/images/" + file.getOriginalFilename());
+                Files.write(path, bytes);
+                fileNames.append(file.getOriginalFilename() + ", ");
+            }
+
+            return ResponseEntity.ok().body(savedOrder);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body(savedOrder);
+        }
     }
 
     @PutMapping(value = "/{id}")
