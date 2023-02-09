@@ -371,13 +371,18 @@ const OrderIndex = () => {
                 <div>Images: {selectedOrder ? selectedOrder.orderFiles?.length : ''}</div>
             </DialogContent>
             <DialogActions>
+                <Button color="error" onClick={() => {
+                    deleteOrder(selectedOrder)
+                    handleViewClose()
+                }}>
+                    Delete
+                </Button>
                 <Button onClick={handleViewClose} autoFocus>
                     OK
                 </Button>
             </DialogActions>
         </Dialog>
     )
-
 
     return (
         <Layout>
