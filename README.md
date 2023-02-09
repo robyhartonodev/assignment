@@ -28,4 +28,6 @@ Als User möchte ich einzelne Lieferungen in der Einzel- sowie der Listenansicht
 
 # How to run
 
-TODO
+1. Install docker and docker compose
+2. Run `docker-compose up`
+3. Open localhost:8080
