@@ -31,3 +31,7 @@ Als User möchte ich einzelne Lieferungen in der Einzel- sowie der Listenansicht
 1. Install docker and docker compose
 2. Run `docker-compose up`
 3. Open localhost:8080
+
+# Preview
+
+![alt text](https://raw.githubusercontent.com/robyhartonodev/assignment/master/preview/preview.png)
