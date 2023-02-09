@@ -50,6 +50,5 @@ public class Order {
     private Customer customer;
 
     @OneToMany(mappedBy = "order")
-    @JsonIgnore
     private List<OrderFile> orderFiles;
 }

@@ -38,16 +38,37 @@ const OrderIndex = () => {
             })
     }
 
+    // For select customers
     const [customers, setCustomers] = useState([])
-
     const getCustomers = () => {
         fetch("http://localhost:8080/api/v1/customers")
             .then((response) => response.json())
             .then((data) => setCustomers(data))
     }
 
-    const deleteOrders = () => {
+    const deleteOrder = (row) => {
+        const orderId = row.id;
 
+        fetch(`http://localhost:8080/api/v1/orders/${orderId}`, {
+            method: 'DELETE',
+        })
+            .then((response) => {
+                showFlashMessage({
+                    type: 'success',
+                    message: 'Order Deleted Successfuly',
+                    isOpen: true
+                })
+            })
+            .catch(() => {
+                showFlashMessage({
+                    type: 'danger',
+                    message: 'Delete failed',
+                    isOpen: true
+                })
+            })
+            .finally(() => {
+                getOrders()
+            })
     }
 
     const columns = [
@@ -78,6 +99,11 @@ const OrderIndex = () => {
                             setViewOpen(true)
                         }} variant="contained" sx={{mr: '4px'}}>
                             View
+                        </Button>
+                        <Button color="error" onClick={() => {
+                            deleteOrder(row)
+                        }} variant="contained">
+                            Delete
                         </Button>
                     </Box>
                 )

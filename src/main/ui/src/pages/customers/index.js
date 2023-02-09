@@ -68,10 +68,6 @@ const CustomerIndex = () => {
             renderCell: ({row}) => {
                 return (
                     <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        {/*<Button color="success" onClick={() => {*/}
-                        {/*}} variant="contained" sx={{mr: '4px'}}>*/}
-                        {/*    Edit*/}
-                        {/*</Button>*/}
                         <Button color="error" onClick={() => {
                             deleteCustomer(row)
                         }} variant="contained">
