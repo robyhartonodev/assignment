@@ -16,7 +16,7 @@ create table "orders"
 );
 
 alter table "orders"
-    add constraint "orders_customer_id_foreign" foreign key ("customer_id") references "orders" ("id") on delete cascade on update cascade;
+    add constraint "orders_customer_id_foreign" foreign key ("customer_id") references "customers" ("id") on delete cascade on update cascade;
 
 create table "order_files"
 (

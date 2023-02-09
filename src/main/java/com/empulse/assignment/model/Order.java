@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -49,5 +50,6 @@ public class Order {
     private Customer customer;
 
     @OneToMany(mappedBy = "order")
-    private Set<OrderFile> orderFiles;
+    @JsonIgnore
+    private List<OrderFile> orderFiles;
 }

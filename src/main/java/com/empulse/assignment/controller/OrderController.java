@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -117,7 +118,17 @@ public class OrderController {
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("id") Long id) {
+    public void delete(@PathVariable("id") Long id) throws Exception {
+        Order order = orderServiceImpl.findById(id).orElseThrow(() -> new Exception("Order Not Found"));
+
+        List<OrderFile> orderFiles = order.getOrderFiles();
+
+        // Delete files and record
+        for (OrderFile orderFile : orderFiles) {
+            Path path = Paths.get("src/main/resources/files/" + orderFile.getName());
+            Files.delete(path);
+            orderFileServiceImpl.deleteById(orderFile.getId());
+        }
         orderServiceImpl.deleteById(id);
     }
 }

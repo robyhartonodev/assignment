@@ -73,6 +73,9 @@ const OrderIndex = () => {
                 return (
                     <Box sx={{display: 'flex', alignItems: 'center'}}>
                         <Button color="primary" onClick={() => {
+                            console.log(row)
+                            setSelectedOrder(row)
+                            setViewOpen(true)
                         }} variant="contained" sx={{mr: '4px'}}>
                             View
                         </Button>
@@ -178,8 +181,8 @@ const OrderIndex = () => {
             formData.append('multipartFiles', file)
         })
 
-        for(const pair of formData.entries()) {
-            console.log(pair[0]+ ', '+ pair[1]);
+        for (const pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
         }
 
         fetch("http://localhost:8080/api/v1/orders", {
@@ -316,6 +319,40 @@ const OrderIndex = () => {
         </div>
     )
 
+    // View dialog
+    const [selectedOrder, setSelectedOrder] = useState(null)
+    const [viewOpen, setViewOpen] = useState(false)
+
+    const handleViewClose = () => {
+        setSelectedOrder(null)
+        setViewOpen(false)
+    }
+
+    const dialogViewOrder = (
+        <Dialog
+            open={viewOpen}
+            onClose={handleViewClose}
+            aria-labelledby="alert-dialog-title"
+        >
+            <DialogTitle id="alert-dialog-title">
+                Order ID: {selectedOrder ? selectedOrder.id : ''}
+            </DialogTitle>
+            <DialogContent>
+                <div>Subject: {selectedOrder ? selectedOrder.subject : ''}</div>
+                <div>Order Date: {selectedOrder ? selectedOrder.orderDate : ''}</div>
+                <div>Customer Name: {selectedOrder ? selectedOrder.customer.name : ''}</div>
+                <div>Customer Email: {selectedOrder ? selectedOrder.customer.email : ''}</div>
+                <div>Images: {selectedOrder ? selectedOrder.orderFiles?.length : ''}</div>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleViewClose} autoFocus>
+                    OK
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+
+
     return (
         <Layout>
             <Typography variant="h3" marginBottom={4}>
@@ -324,6 +361,10 @@ const OrderIndex = () => {
 
             <div>
                 {dialogOrderForm}
+            </div>
+
+            <div>
+                {dialogViewOrder}
             </div>
 
             <div style={{width: '100%'}}>

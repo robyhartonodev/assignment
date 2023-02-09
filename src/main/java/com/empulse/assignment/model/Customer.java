@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -33,5 +34,5 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer")
     @JsonIgnore
-    private Set<Order> orders;
+    private List<Order> orders;
 }
