@@ -10,7 +10,6 @@ create table "orders"
     "id"              bigserial primary key not null,
     "subject"         varchar(255)          not null,
     "order_date"      date                  not null,
-    "order_date_time" timestamp(0) without time zone not null,
     "status"          bigint                not null,
     "customer_id"     bigint                not null
 );

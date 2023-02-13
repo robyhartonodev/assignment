@@ -8,13 +8,19 @@ import com.empulse.assignment.service.OrderFileServiceImpl;
 import com.empulse.assignment.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,7 +59,6 @@ public class OrderController {
             @RequestParam Integer customerId,
             @RequestParam String subject,
             @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") Date orderDate,
-            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss") Date orderDateTime,
             @RequestParam Integer status
     ) throws Exception {
         Long longCustomerId = Long.valueOf(customerId);
@@ -62,7 +67,6 @@ public class OrderController {
         Order resource = new Order();
         resource.setSubject(subject);
         resource.setOrderDate(orderDate);
-        resource.setOrderDateTime(orderDateTime);
         resource.setStatus(status);
         resource.setCustomer(customer);
 
@@ -130,5 +134,26 @@ public class OrderController {
             orderFileServiceImpl.deleteById(orderFile.getId());
         }
         orderServiceImpl.deleteById(id);
+    }
+
+    @GetMapping(value = "download/orderFile/{orderFileId}")
+    public ResponseEntity<?> downloadOrderFile(
+            @PathVariable("orderFileId") Long orderFileId) throws Exception {
+        OrderFile orderFile = orderFileServiceImpl.findById(orderFileId).orElseThrow(() -> new Exception("Order File Not Found"));
+
+        File file = new File(orderFile.getPath());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(orderFile);
     }
 }

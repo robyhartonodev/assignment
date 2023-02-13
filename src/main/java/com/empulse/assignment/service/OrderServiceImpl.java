@@ -6,6 +6,7 @@ import com.empulse.assignment.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,10 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> findAllByCustomer(Customer customer) {
         return orderRepository.findAllByCustomer(customer);
     }
+
+    public List<Order> findAllByStatusAndOrderDate(Integer status, Date orderDate) {
+        return orderRepository.findAllByStatusAndOrderDate(status, orderDate);
+    };
 
     @Override
     public List<Order> findAll() {

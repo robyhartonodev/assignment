@@ -94,7 +94,6 @@ const OrderIndex = () => {
                 return (
                     <Box sx={{display: 'flex', alignItems: 'center'}}>
                         <Button color="primary" onClick={() => {
-                            console.log(row)
                             setSelectedOrder(row)
                             setViewOpen(true)
                         }} variant="contained" sx={{mr: '4px'}}>
@@ -118,18 +117,10 @@ const OrderIndex = () => {
 
     // Form stuffs
     const [open, setOpen] = useState(false)
-    const [order, setOrder] = useState({
-        subject: '',
-        customerId: 0,
-        orderDate: '',
-        orderDateTime: '',
-        status: 0
-    })
 
     const [subject, setSubject] = useState('')
     const [customerId, setCustomerId] = useState('')
     const [orderDate, setOrderDate] = useState(new Date())
-    const [orderDateTime, setOrderDateTime] = useState('')
     const [status, setStatus] = useState(0)
     const [files, setFiles] = useState([])
 
@@ -143,7 +134,6 @@ const OrderIndex = () => {
         setStatus(0)
         setCustomerId('')
         setOrderDate(new Date())
-        setOrderDateTime('')
         setFiles([])
     };
 
@@ -200,7 +190,6 @@ const OrderIndex = () => {
 
         if (orderDate) {
             formData.append('orderDate', format(orderDate, 'dd-MM-yyyy'))
-            formData.append('orderDateTime', format(orderDate, 'dd-MM-yyyy HH:mm:ss'))
         }
 
         files.forEach((file) => {

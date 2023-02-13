@@ -48,7 +48,7 @@ public class BatchConfiguration {
     }
 
     // Every n minute run batch job zip order files
-    // @Scheduled(cron = "0 0/5 * * * *")
+     @Scheduled(cron = "0 0/1 * * * *")
     public void scheduleOrderProcess() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         Step step = batchStep(jobRepository, myTasklet(), platformTransactionManager);
         Job job = batchOrderJob(jobRepository, step);

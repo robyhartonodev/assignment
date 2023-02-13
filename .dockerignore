@@ -6,3 +6,4 @@ target/
 .sonar/
 .sonarlint/
 src/main/ui/node_modules
+src/main/ui/resources/static

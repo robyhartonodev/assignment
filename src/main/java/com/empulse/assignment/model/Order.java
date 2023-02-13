@@ -32,13 +32,8 @@ public class Order {
     @NotNull
     @Column(name = "order_date")
     @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "EST")
     private Date orderDate;
-
-    @Column(name = "order_date_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private Date orderDateTime;
 
     // 0:PROCESSING;1:SUCCESS;2:FAILED
     @NotNull
