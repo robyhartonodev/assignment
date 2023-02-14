@@ -2,6 +2,7 @@ package com.empulse.assignment.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class Order {
     private Long id;
 
     @NotNull
+    @NotBlank
     @Column(name = "subject")
     private String subject;
 

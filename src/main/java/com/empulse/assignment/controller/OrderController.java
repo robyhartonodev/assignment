@@ -1,5 +1,6 @@
 package com.empulse.assignment.controller;
 
+import com.empulse.assignment.exception.ErrorResponse;
 import com.empulse.assignment.model.Customer;
 import com.empulse.assignment.model.Order;
 import com.empulse.assignment.model.OrderFile;
@@ -7,6 +8,9 @@ import com.empulse.assignment.service.CustomerServiceImpl;
 import com.empulse.assignment.service.OrderFileServiceImpl;
 import com.empulse.assignment.service.OrderServiceImpl;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,11 +26,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/orders")
+@Slf4j
 public class OrderController {
     private final OrderServiceImpl orderServiceImpl;
     private final OrderFileServiceImpl orderFileServiceImpl;
@@ -53,9 +57,9 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> create(
             @RequestParam MultipartFile[] multipartFiles,
-            @RequestParam Integer customerId,
-            @RequestParam String subject,
-            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") Date orderDate,
+            @RequestParam @NotBlank @NotNull Integer customerId,
+            @RequestParam @NotBlank @NotNull String subject,
+            @RequestParam @NotBlank @NotNull @DateTimeFormat(pattern = "dd-MM-yyyy") Date orderDate,
             @RequestParam Integer status
     ) throws Exception {
         Long longCustomerId = Long.valueOf(customerId);
@@ -67,22 +71,28 @@ public class OrderController {
         resource.setStatus(status);
         resource.setCustomer(customer);
 
-        Order savedOrder = orderServiceImpl.save(resource);
-
         // Saving files in the static folder and save the file path and name in the db
         try {
             // Validation file type images only and size each cannot be more than 3MB
             for (MultipartFile file : multipartFiles) {
+                Map<String, String> body = new HashMap<>();
+
                 if (file.getSize() > 3 * 1024 * 1024) {
-                    return new ResponseEntity<>("File size too large", HttpStatus.BAD_REQUEST);
+                    body.put("status", "400");
+                    body.put("message", "File size is more than 3MB");
+                    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
                 }
 
                 if (!file.getContentType().equals("image/jpeg") &&
                         !file.getContentType().equals("image/jpg") &&
                         !file.getContentType().equals("image/png")) {
-                    return new ResponseEntity<>("Invalid file type", HttpStatus.BAD_REQUEST);
+                    body.put("status", "400");
+                    body.put("message", "File type must be image");
+                    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
                 }
             }
+
+            Order savedOrder = orderServiceImpl.save(resource);
 
             for (MultipartFile file : multipartFiles) {
                 byte[] bytes = file.getBytes();
@@ -104,7 +114,7 @@ public class OrderController {
 
             return ResponseEntity.ok().body(updatedOrder);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body(savedOrder);
+            return ResponseEntity.badRequest().body(resource);
         }
     }
 

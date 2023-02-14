@@ -2,6 +2,7 @@ import Layout from "@/components/layout";
 import {useEffect, useState} from "react";
 import {useFlashStore} from "@/stores/flash";
 import {
+    Alert,
     Box,
     Button,
     Dialog,
@@ -139,6 +140,8 @@ const OrderIndex = () => {
     const [status, setStatus] = useState(0)
     const [files, setFiles] = useState([])
 
+    const [error, setError] = useState(null)
+
     const handleClickOpen = () => {
         setOpen(true)
     };
@@ -150,6 +153,7 @@ const OrderIndex = () => {
         setCustomerId('')
         setOrderDate(new Date())
         setFiles([])
+        setError(null)
     };
 
     const convertFileListToGrayscale = (fileList) => {
@@ -234,11 +238,23 @@ const OrderIndex = () => {
                         message: 'Create failed. Please check your inputs',
                         isOpen: true
                     })
+
+                    response.json().then(data => {
+                        setError(data.message)
+                    })
                 }
             })
             .finally(() => {
                 getOrders()
             });
+    }
+
+    const errorForm = (err) => {
+        return (
+            <Alert severity="error" sx={{mb: 2}}>
+                {err}
+            </Alert>
+        )
     }
 
     const dialogOrderForm = (
@@ -255,6 +271,9 @@ const OrderIndex = () => {
                     Form Order
                 </DialogTitle>
                 <DialogContent>
+                    {/* Error Form */}
+                    {error ? errorForm(error) : <></>}
+
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -297,7 +316,6 @@ const OrderIndex = () => {
                                     minDate={new Date()}
                                     onChange={(newValue) => {
                                         setOrderDate(newValue)
-                                        console.log(format(newValue, 'dd-MM-yyyy HH:mm:ss'))
                                     }}
                                     renderInput={(params) => <TextField {...params} fullWidth/>}
                                 />
@@ -361,11 +379,25 @@ const OrderIndex = () => {
     // List file components for dialog view
     const listOrderFile = (files) => {
         const downloadOnclick = (orderId) => {
+            let filename = 'test123';
+
             fetch("http://localhost:8080/api/v1/orders/download/orderFile/" + orderId)
-                .then((response) => response.blob())
-                .then(blob => {
-                    const file = window.URL.createObjectURL(blob);
-                    console.log(blob)
+                .then((response) => {
+                    if (response.status === 200) {
+                        const header = response.headers.get('Content-Disposition')
+                        const parts = header.split(';');
+                        filename = parts[1].split('=')[1];
+                    }
+                    return response.blob()
+                })
+                .then((blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                    a.click();
+                    a.remove();
                 })
         }
 
@@ -373,12 +405,12 @@ const OrderIndex = () => {
             <List>
                 {
                     files ? files.map((file) => (
-                        <ListItem disablePadding>
+                        <ListItem disablePadding key={file.id}>
                             <ListItemButton onClick={() => {
                                 downloadOnclick(file.id)
                             }}>
                                 <ListItemIcon>
-                                    <AttachFileIcon />
+                                    <AttachFileIcon/>
                                 </ListItemIcon>
                                 <ListItemText primary={file.name}/>
                             </ListItemButton>
@@ -438,9 +470,13 @@ const OrderIndex = () => {
                 Orders
             </Typography>
 
-            <div>
+            <Box sx={{display: 'flex', mb: 4}}>
                 {dialogOrderForm}
-            </div>
+
+                <Button color="info" variant="contained" onClick={getOrders} style={{marginLeft: 8}}>
+                    Refresh
+                </Button>
+            </Box>
 
             <div>
                 {dialogViewOrder}

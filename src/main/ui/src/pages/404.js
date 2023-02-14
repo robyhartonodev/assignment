@@ -1,8 +1,10 @@
 import Layout from "@/components/layout";
+import {Typography} from "@mui/material";
 
 export default function Custom404() {
     return (
         <Layout>
-            <h1>404 - Page Not Found</h1>
-        </Layout>)
+            <Typography variant="h3">404 - Page Not Found</Typography>
+        </Layout>
+    )
 }

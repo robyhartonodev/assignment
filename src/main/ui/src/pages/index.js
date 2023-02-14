@@ -2,6 +2,7 @@ import {Inter} from '@next/font/google'
 import Layout from "@/components/layout";
 import {useRouter} from "next/router";
 import {useEffect} from "react";
+import {Typography} from "@mui/material";
 
 const inter = Inter({subsets: ['latin']})
 
@@ -19,7 +20,7 @@ export default function Index() {
 
     return (
         <Layout>
-            index
+            <Typography variant="h3">Empulse Assignment - Index</Typography>
         </Layout>
     )
 }
