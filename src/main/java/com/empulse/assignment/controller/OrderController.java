@@ -8,7 +8,7 @@ import com.empulse.assignment.service.OrderFileServiceImpl;
 import com.empulse.assignment.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,22 +18,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
-    private OrderServiceImpl orderServiceImpl;
-    private OrderFileServiceImpl orderFileServiceImpl;
-    private CustomerServiceImpl customerServiceImpl;
+    private final OrderServiceImpl orderServiceImpl;
+    private final OrderFileServiceImpl orderFileServiceImpl;
+    private final CustomerServiceImpl customerServiceImpl;
 
     @Autowired
     public OrderController(OrderServiceImpl orderServiceImpl, OrderFileServiceImpl orderFileServiceImpl, CustomerServiceImpl customerServiceImpl) {
@@ -142,18 +139,19 @@ public class OrderController {
         OrderFile orderFile = orderFileServiceImpl.findById(orderFileId).orElseThrow(() -> new Exception("Order File Not Found"));
 
         File file = new File(orderFile.getPath());
+        Path path = Paths.get(file.getAbsolutePath());
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
-
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + orderFile.getName());
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(file.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(orderFile);
+                .body(resource);
     }
 }

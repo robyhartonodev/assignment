@@ -1,7 +1,6 @@
 package com.empulse.assignment.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -32,7 +30,7 @@ public class Order {
     @NotNull
     @Column(name = "order_date")
     @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "dd-MM-yyyy", timezone = "EST")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date orderDate;
 
     // 0:PROCESSING;1:SUCCESS;2:FAILED

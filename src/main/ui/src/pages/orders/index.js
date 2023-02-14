@@ -11,6 +11,11 @@ import {
     FormControl,
     Grid,
     InputLabel,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
     MenuItem,
     Select,
     TextField,
@@ -20,6 +25,7 @@ import {DataGrid} from "@mui/x-data-grid";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {format} from 'date-fns'
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 const OrderIndex = () => {
     const [rows, setRows] = useState([])
@@ -73,12 +79,21 @@ const OrderIndex = () => {
 
     const columns = [
         {field: 'id', headerName: 'ID', flex: 1},
-        {field: 'subject', headerName: 'Name', flex: 1},
-        {field: 'orderDate', headerName: 'Order Date', flex: 1},
+        {field: 'subject', headerName: 'Subject', flex: 1},
+        {field: 'orderDate', headerName: 'Order date', flex: 1},
+        {
+            field: 'customer', headerName: 'Customer name', flex: 1, renderCell: ({row}) => {
+                const val = (row.customer) ? row.customer.name : '';
+                return (
+                    <Typography>
+                        {val}
+                    </Typography>
+                )
+            }
+        },
         {
             field: 'status', headerName: 'Status', flex: 1, renderCell: ({row}) => {
                 const val = (row.status === 0) ? "PROCESSING" : (row.status === 1) ? "SUCCESS" : "FAILED";
-
                 return (
                     <Typography>
                         {val}
@@ -343,6 +358,37 @@ const OrderIndex = () => {
         setViewOpen(false)
     }
 
+    // List file components for dialog view
+    const listOrderFile = (files) => {
+        const downloadOnclick = (orderId) => {
+            fetch("http://localhost:8080/api/v1/orders/download/orderFile/" + orderId)
+                .then((response) => response.blob())
+                .then(blob => {
+                    const file = window.URL.createObjectURL(blob);
+                    console.log(blob)
+                })
+        }
+
+        return (
+            <List>
+                {
+                    files ? files.map((file) => (
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => {
+                                downloadOnclick(file.id)
+                            }}>
+                                <ListItemIcon>
+                                    <AttachFileIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={file.name}/>
+                            </ListItemButton>
+                        </ListItem>
+                    )) : <></>
+                }
+            </List>
+        )
+    }
+
     const dialogViewOrder = (
         <Dialog
             open={viewOpen}
@@ -353,11 +399,24 @@ const OrderIndex = () => {
                 Order ID: {selectedOrder ? selectedOrder.id : ''}
             </DialogTitle>
             <DialogContent>
-                <div>Subject: {selectedOrder ? selectedOrder.subject : ''}</div>
-                <div>Order Date: {selectedOrder ? selectedOrder.orderDate : ''}</div>
-                <div>Customer Name: {selectedOrder ? selectedOrder.customer.name : ''}</div>
-                <div>Customer Email: {selectedOrder ? selectedOrder.customer.email : ''}</div>
-                <div>Images: {selectedOrder ? selectedOrder.orderFiles?.length : ''}</div>
+                <Typography component="div">Subject: {selectedOrder ? selectedOrder.subject : ''}</Typography>
+                <Typography component="div">Order Date: {selectedOrder ? selectedOrder.orderDate : ''}</Typography>
+                <Typography component="div">Customer
+                    Name: {selectedOrder ? selectedOrder.customer.name : ''}
+                </Typography>
+                <Typography component="div">Customer
+                    Email: {selectedOrder ? selectedOrder.customer.email : ''}
+                </Typography>
+                <Typography component="div">File
+                    Counts: {selectedOrder ? selectedOrder.orderFiles?.length : ''}
+                </Typography>
+
+                <Typography component="div">
+                    Files:
+                </Typography>
+                <div>
+                    {selectedOrder ? listOrderFile(selectedOrder.orderFiles) : <></>}
+                </div>
             </DialogContent>
             <DialogActions>
                 <Button color="error" onClick={() => {
@@ -395,6 +454,11 @@ const OrderIndex = () => {
                     rowsPerPageOptions={[5]}
                     disableSelectionOnClick
                     autoHeight={true}
+                    initialState={{
+                        sorting: {
+                            sortModel: [{field: 'orderDate', sort: 'desc'}],
+                        },
+                    }}
                 />
             </div>
         </Layout>
